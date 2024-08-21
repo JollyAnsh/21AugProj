@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #404040;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            background-color: #8fffe1;
+            border-radius: 8px;
+            padding: 30px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .quiz-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-container label {
+            display: block;
+            margin: 15px 0;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        #results {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <h2>State Capitals Quiz</h2>
+        <button id="start">Let's Play!</button>
+    </div>
+
+    <script>
+        const quizData = [
+            { question: "What is the capital of Punjab?", options: ["Chandigarh", "Amritsar", "Mansa", "Mohali"], correct: 0 },
+            { question: "What is the capital of Maharashtra?", options: ["Mumbai", "Pune", "Nagpur", "Nashik"], correct: 0 },
+            { question: "What is the capital of Karnataka?", options: ["Mysore", "Bengaluru", "Hubli", "Mangalore"], correct: 1 },
+            { question: "What is the capital of West Bengal?", options: ["Siliguri", "Howrah", "Kolkata", "Darjeeling"], correct: 2 },
+            { question: "What is the capital of Tamil Nadu?", options: ["Chennai", "Coimbatore", "Madurai", "Trichy"], correct: 0 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+        const startButton = document.getElementById('start');
+
+        function loadQuiz() {
+            const { question, options, correct } = quizData[currentQuestionIndex];
+            quizContainer.innerHTML = `
+                <div id="score">Score: ${score}</div>
+                <h2>${question}</h2>
+                ${options.map((option, index) => `
+                    <label>
+                        <input type="radio" name="answer" value="${index}">
+                        ${option}
+                    </label>
+                `).join('')}
+                <div class="feedback" id="feedback"></div>
+                <button id="submit">Submit Answer</button>
+            `;
+            document.getElementById('submit').onclick = submitAnswer;
+        }
+
+        function submitAnswer() {
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (selectedAnswer) {
+                const correct = quizData[currentQuestionIndex].correct;
+                const isCorrect = parseInt(selectedAnswer.value) === correct;
+                score += isCorrect ? 1 : 0;
+                showFeedback(isCorrect, quizData[currentQuestionIndex].options[correct]);
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    setTimeout(loadQuiz, 2000);
+                } else {
+                    setTimeout(showFinalResults, 2000);
+                }
+            }
+        }
+
+        function showFeedback(isCorrect, correctAnswerText) {
+            document.getElementById('feedback').textContent = isCorrect ? "Correct!" : `Incorrect! Answer: ${correctAnswerText}`;
+        }
+
+        function showFinalResults() {
+            quizContainer.innerHTML = `
+                <h2>Your Final Score: ${score} / ${quizData.length}</h2>
+                <button onclick="location.reload()">Play Again?</button>
+            `;
+        }
+
+        startButton.onclick = loadQuiz;
+    </script>
+</body>
+</html>
